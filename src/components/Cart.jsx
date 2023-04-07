@@ -2,24 +2,22 @@ import { useState } from 'react';
 import CartItem from './CartItem';
 import CartSummary from './CartSummary';
 
-function Cart({ cart, onUpdateCart, vendors }) {
-  const [shippingCosts, setShippingCosts] = useState(
-    Array(vendors.length).fill(0)
-  );
-  const [discountAmounts, setDiscountAmounts] = useState(
-    Array(vendors.length).fill(0)
-  );
+function Cart({ cart, vendors, onUpdateCart }) {
+  const [shippingCosts, setShippingCosts] = useState({});
+  const [discountAmounts, setDiscountAmounts] = useState({});
 
-  const handleShippingCostChange = (index, value) => {
-    const updatedShippingCosts = [...shippingCosts];
-    updatedShippingCosts[index] = parseFloat(value) || 0;
-    setShippingCosts(updatedShippingCosts);
+  const handleShippingCostChange = (vendorId, value) => {
+    setShippingCosts((prev) => ({
+      ...prev,
+      [vendorId]: parseFloat(value) || 0,
+    }));
   };
 
-  const handleDiscountAmountChange = (index, value) => {
-    const updatedDiscountAmounts = [...discountAmounts];
-    updatedDiscountAmounts[index] = parseFloat(value) || 0;
-    setDiscountAmounts(updatedDiscountAmounts);
+  const handleDiscountAmountChange = (vendorId, value) => {
+    setDiscountAmounts((prev) => ({
+      ...prev,
+      [vendorId]: parseFloat(value) || 0,
+    }));
   };
 
   const groupedCart = vendors
@@ -50,9 +48,9 @@ function Cart({ cart, onUpdateCart, vendors }) {
               <input
                 className="border border-gray-300 p-1 rounded mr-4 w-24"
                 type="number"
-                value={shippingCosts[index]}
+                defaultValue={shippingCosts[vendor.id] || 0}
                 onChange={(e) =>
-                  handleShippingCostChange(index, e.target.value)
+                  handleShippingCostChange(vendor.id, e.target.value)
                 }
               />
             </div>
@@ -61,9 +59,9 @@ function Cart({ cart, onUpdateCart, vendors }) {
               <input
                 className="border border-gray-300 p-1 rounded w-24"
                 type="number"
-                value={discountAmounts[index]}
+                defaultValue={discountAmounts[vendor.id] || 0}
                 onChange={(e) =>
-                  handleDiscountAmountChange(index, e.target.value)
+                  handleDiscountAmountChange(vendor.id, e.target.value)
                 }
               />
             </div>

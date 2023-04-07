@@ -3,11 +3,11 @@ const Item = ({ product, onUpdateCart }) => {
 
   const handleQuantityChange = (e) => {
     const quantity = parseInt(e.target.value) || 0;
-    onUpdateCart(product.id, quantity);
+    onUpdateCart(product, quantity);
   };
 
   const handleRemove = () => {
-    onUpdateCart(product.id, 0);
+    onUpdateCart(product, 0);
   };
 
   return (
