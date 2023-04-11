@@ -24,6 +24,8 @@ function CartSummary({ cart, vendors, shippingCosts, discountAmounts }) {
     const commission =
       (subtotal * vendor.commissionRate) / 100 + vendor.fixedAmount;
     const taxableAmount = subtotal - commission;
+    const commission_tax = (commission * vendor.taxRate) / 100;
+    const commission = commission + commission_tax;
     const tax = (taxableAmount * vendor.taxRate) / 100;
     const shipping = shippingCosts[vendor.id] || 0;
     const discount = discountAmounts[vendor.id] || 0;
