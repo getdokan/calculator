@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import CartItem from './CartItem';
 import CartSummary from './CartSummary';
+import PriceInput from './priceInput';
 
 function Cart({ cart, vendors, onUpdateCart }) {
   const [shippingCosts, setShippingCosts] = useState({});
   const [discountAmounts, setDiscountAmounts] = useState({});
+  const [discountType, setDiscountType] = useState({});
 
   const handleShippingCostChange = (vendorId, value) => {
     setShippingCosts((prev) => ({
@@ -17,6 +19,13 @@ function Cart({ cart, vendors, onUpdateCart }) {
     setDiscountAmounts((prev) => ({
       ...prev,
       [vendorId]: parseFloat(value) || 0,
+    }));
+  };
+
+  const handleDiscountTypeChange = (vendorId, value) => {
+    setDiscountType((prev) => ({
+      ...prev,
+      [vendorId]: value,
     }));
   };
 
@@ -42,26 +51,44 @@ function Cart({ cart, vendors, onUpdateCart }) {
             />
           ))}
 
-          <div className="flex">
-            <div className="mt-2">
+          <div className="flex mt-2 w-72">
+            <div className="mr-2 flex-1">
               <label className="mr-2">Shipping Cost:</label>
-              <input
-                className="border border-gray-300 p-1 rounded mr-4 w-24"
+              <PriceInput
+                className="mt-1"
                 type="number"
+                min="0"
                 defaultValue={shippingCosts[vendor.id] || 0}
                 onChange={(e) =>
                   handleShippingCostChange(vendor.id, e.target.value)
                 }
+                leadingAddon={
+                  <span className="text-gray-500 sm:text-sm">$</span>
+                }
               />
             </div>
-            <div className="mt-2">
+            <div className="flex-1">
               <label className="mr-2">Discount Amount:</label>
-              <input
-                className="border border-gray-300 p-1 rounded w-24"
+              <PriceInput
+                className="mt-1"
                 type="number"
+                min="0"
                 defaultValue={discountAmounts[vendor.id] || 0}
                 onChange={(e) =>
                   handleDiscountAmountChange(vendor.id, e.target.value)
+                }
+                trailPadding="pr-12"
+                trailingAddon={
+                  <select
+                    className="h-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+                    value={discountType[vendor.id] || 'percent'}
+                    onChange={(e) =>
+                      handleDiscountTypeChange(vendor.id, e.target.value)
+                    }
+                  >
+                    <option value="fixed">$</option>
+                    <option value="percent">%</option>
+                  </select>
                 }
               />
             </div>
@@ -77,6 +104,7 @@ function Cart({ cart, vendors, onUpdateCart }) {
           vendors={vendors}
           shippingCosts={shippingCosts}
           discountAmounts={discountAmounts}
+          discountType={discountType}
         />
       )}
     </div>

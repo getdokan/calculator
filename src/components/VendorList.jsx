@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PriceInput from './priceInput';
 
 function VendorList({ vendors, onCommissionChange }) {
   const [editing, setEditing] = useState(-1);
@@ -27,10 +28,9 @@ function VendorList({ vendors, onCommissionChange }) {
             </button>
             {editing === vendor.id && (
               <div className="flex flex-col bg-green-100 p-2 mt-2 rounded">
-                <div className="mt-2">
+                <div className="w-36">
                   <label className="mr-2">Commision Rate:</label>
-                  <input
-                    className="border border-gray-300 p-1 rounded mr-4"
+                  <PriceInput
                     type="number"
                     value={vendor.commissionRate}
                     onChange={(e) =>
@@ -40,12 +40,14 @@ function VendorList({ vendors, onCommissionChange }) {
                         parseFloat(e.target.value)
                       )
                     }
+                    trailingAddon={
+                      <span className="text-gray-500 sm:text-sm pr-3">%</span>
+                    }
                   />
                 </div>
-                <div className="mt-2">
+                <div className="w-36 mt-2">
                   <label className="mr-2">Fixed Amount:</label>
-                  <input
-                    className="border border-gray-300 p-1 rounded mr-4"
+                  <PriceInput
                     type="number"
                     value={vendor.fixedAmount}
                     onChange={(e) =>
@@ -55,12 +57,14 @@ function VendorList({ vendors, onCommissionChange }) {
                         parseFloat(e.target.value)
                       )
                     }
+                    leadingAddon={
+                      <span className="text-gray-500 sm:text-sm">$</span>
+                    }
                   />
                 </div>
-                <div className="mt-2">
+                <div className="w-36 mt-2">
                   <label className="mr-2">Tax Rate:</label>
-                  <input
-                    className="border border-gray-300 p-1 rounded"
+                  <PriceInput
                     type="number"
                     value={vendor.taxRate}
                     onChange={(e) =>
@@ -69,6 +73,9 @@ function VendorList({ vendors, onCommissionChange }) {
                         'taxRate',
                         parseFloat(e.target.value)
                       )
+                    }
+                    trailingAddon={
+                      <span className="text-gray-500 sm:text-sm pr-3">%</span>
                     }
                   />
                 </div>

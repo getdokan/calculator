@@ -1,6 +1,12 @@
 import { useState } from 'react';
 
-function CartSummary({ cart, vendors, shippingCosts, discountAmounts }) {
+function CartSummary({
+  cart,
+  vendors,
+  shippingCosts,
+  discountAmounts,
+  discountType,
+}) {
   const [chargeShippingTax, setChargeShippingTax] = useState(false);
 
   const summary = cart.reduce((acc, product) => {
@@ -24,8 +30,19 @@ function CartSummary({ cart, vendors, shippingCosts, discountAmounts }) {
     }
 
     const discount = discountAmounts[vendor.id] || 0;
-    const productDiscount = discount ? discount / vendorProductCount : 0;
-    const subtotal = product.price * product.quantity - productDiscount;
+    const cartDiscountType = discountType[vendor.id] || 'percent';
+    const productSubtotal = product.price * product.quantity;
+    let productDiscount = 0;
+
+    if (discount) {
+      if (cartDiscountType === 'percent') {
+        productDiscount = (productSubtotal * discount) / 100;
+      } else {
+        productDiscount = discount / vendorProductCount;
+      }
+    }
+
+    const subtotal = productSubtotal - productDiscount;
     const commission =
       (subtotal * vendor.commissionRate) / 100 + vendor.fixedAmount;
     const tax = (subtotal * vendor.taxRate) / 100;
@@ -41,7 +58,7 @@ function CartSummary({ cart, vendors, shippingCosts, discountAmounts }) {
     acc[vendor.id].commission += commission;
     acc[vendor.id].tax += tax;
     acc[vendor.id].shipping = shipping;
-    acc[vendor.id].discount = discount;
+    acc[vendor.id].discount = productDiscount;
     acc[vendor.id].net += net;
     acc[vendor.id].shippingTax += shippingTax;
 
