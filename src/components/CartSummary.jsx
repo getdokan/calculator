@@ -5,11 +5,14 @@ function CartSummary({ cart, vendors, shippingCosts, discountAmounts }) {
 
   const summary = cart.reduce((acc, product) => {
     const vendor = vendors.find((v) => v.id === product.vendorId);
-    const vendorIndex = vendors.findIndex((v) => v.id === product.vendorId);
+    const vendorProductCount = cart.filter(
+      (p) => p.vendorId === vendor.id
+    ).length;
 
     if (!acc[vendor.id]) {
       acc[vendor.id] = {
         vendor: vendor.name,
+        subtotal: 0,
         total: 0,
         commission: 0,
         tax: 0,
@@ -20,19 +23,21 @@ function CartSummary({ cart, vendors, shippingCosts, discountAmounts }) {
       };
     }
 
-    const subtotal = product.price * product.quantity;
+    const discount = discountAmounts[vendor.id] || 0;
+    const productDiscount = discount ? discount / vendorProductCount : 0;
+    const subtotal = product.price * product.quantity - productDiscount;
     const commission =
       (subtotal * vendor.commissionRate) / 100 + vendor.fixedAmount;
-    const taxableAmount = subtotal - commission;
-    const tax = (taxableAmount * vendor.taxRate) / 100;
+    const tax = (subtotal * vendor.taxRate) / 100;
     const shipping = shippingCosts[vendor.id] || 0;
-    const discount = discountAmounts[vendor.id] || 0;
     const shippingTax = chargeShippingTax
       ? (shipping * vendor.taxRate) / 100
       : 0;
-    const net = taxableAmount + tax + shipping + shippingTax - discount;
+    const total = subtotal + tax + shipping + shippingTax;
+    const net = total - commission;
 
-    acc[vendor.id].total += subtotal;
+    acc[vendor.id].total += total;
+    acc[vendor.id].subtotal += subtotal;
     acc[vendor.id].commission += commission;
     acc[vendor.id].tax += tax;
     acc[vendor.id].shipping = shipping;
@@ -100,17 +105,10 @@ function CartSummary({ cart, vendors, shippingCosts, discountAmounts }) {
                 ${item.discount.toFixed(2)}
               </td>
               <td className="py-2 px-4 border border-gray-300">
-                ${item.total.toFixed(2)}
+                ${item.subtotal.toFixed(2)}
               </td>
               <td className="py-2 px-4 border border-gray-300">
-                $
-                {(
-                  item.total +
-                  item.tax +
-                  item.shipping +
-                  item.shippingTax -
-                  item.discount
-                ).toFixed(2)}
+                ${item.total.toFixed(2)}
               </td>
               <td className="py-2 px-4 border border-gray-300">
                 ${item.commission.toFixed(2)}
